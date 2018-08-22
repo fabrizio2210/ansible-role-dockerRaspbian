@@ -1,0 +1,47 @@
+
+###############
+#Installaazione
+- name: Inserisci chiave gpg per Docker
+  apt_key:
+    id: 0EBFCD88
+    url: https://download.docker.com/linux/{{ansible_local.custom.ID_release}}/gpg
+    state: present
+- name :
+  apt_repository:
+    repo: deb [arch=armhf] https://download.docker.com/linux/{{ansible_local.custom.ID_release}} {{ansible_distribution_release}} stable
+    state: present
+
+- name: installa pacchetti
+  apt: name={{item}} state=present update_cache=yes
+  with_items:
+    - software-properties-common
+    - curl
+    - ca-certificates
+    - apt-transport-https
+    - docker-ce
+
+- name: utente pi
+  user:
+    name: pi
+    groups: docker
+
+- name: Rendi servizio docker modulabile
+  file:
+    path: /etc/systemd/system/docker.service.d
+    state: directory
+
+- name: Metti file per dipendenza mount su gluster e docker
+  copy: src=files/docker/mnt.conf dest=/etc/systemd/system/docker.service.d/mnt.conf mode=0644
+  notify: reload systemd
+
+- meta: flush_handlers
+
+
+- name: Servizio Docker attivo
+  service: name=docker state=started enabled=yes
+
+- name: Cartella per Portainer
+  file:
+    path: /mnt/cluster/portainer
+    state: directory
+    mode: "0777"
