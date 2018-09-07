@@ -1,6 +1,24 @@
 
 ###############
-#Installaazione
+#Installazione custom fact
+- name: Crea custom fact directory
+  file:
+    path: /etc/ansible/facts.d
+    state: directory
+
+- name: Inserisco custom fact
+  copy:
+    src: files/custom.fact
+    dest: /etc/ansible/facts.d/custom.fact
+    mode: 0755
+
+- name: Re-run setup to use custom facts
+  setup: filter=ansible_local
+
+
+###############
+#Installazione
+
 - name: Inserisci chiave gpg per Docker
   apt_key:
     id: 0EBFCD88
@@ -8,7 +26,7 @@
     state: present
 - name :
   apt_repository:
-    repo: deb [arch=armhf] https://download.docker.com/linux/{{ansible_local.custom.ID_release}} {{ansible_distribution_release}} stable
+    repo: deb [arch={{ ansible_local.custom.architecture }}] https://download.docker.com/linux/{{ansible_local.custom.ID_release}} {{ansible_distribution_release}} stable
     state: present
 
 - name: installa pacchetti
