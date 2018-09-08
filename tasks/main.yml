@@ -47,10 +47,12 @@
   file:
     path: /etc/systemd/system/docker.service.d
     state: directory
+  when: not no_gluster
 
 - name: Metti file per dipendenza mount su gluster e docker
   copy: src=files/docker/mnt.conf dest=/etc/systemd/system/docker.service.d/mnt.conf mode=0644
   notify: reload systemd
+  when: not no_gluster
 
 - meta: flush_handlers
 
@@ -63,3 +65,4 @@
     path: /mnt/cluster/portainer
     state: directory
     mode: "0777"
+  when: not no_gluster
