@@ -24,19 +24,29 @@
     id: 0EBFCD88
     url: https://download.docker.com/linux/{{ansible_local.custom.ID_release}}/gpg
     state: present
+
+- name: installa pacchetto di trasporto
+  apt: 
+    name:
+    - apt-transport-https
+    state: present 
+
+- name: installa pacchetti di base
+  apt: 
+    name:
+    - software-properties-common
+    - curl
+    - ca-certificates
+    state: present 
+    update_cache: yes
+
 - name :
   apt_repository:
     repo: deb [arch={{ ansible_local.custom.architecture }}] https://download.docker.com/linux/{{ansible_local.custom.ID_release}} {{ansible_distribution_release}} stable
     state: present
 
-- name: installa pacchetti
-  apt: name={{item}} state=present update_cache=yes
-  with_items:
-    - software-properties-common
-    - curl
-    - ca-certificates
-    - apt-transport-https
-    - docker-ce
+- name: installa pacchetti docker
+  apt: name=docker-ce state=present update_cache=yes
 
 - name: utente pi
   user:
